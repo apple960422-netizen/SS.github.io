@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#17152b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="圖片抽卡冒險">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon.svg">
+<title>圖片抽卡冒險</title>
+<style>
+:root{--bg:#111022;--panel:#211f3d;--panel2:#2b2850;--ink:#f7f4ff;--muted:#bdb8dc;--gold:#ffd166;--pink:#ff7eb6;--cyan:#7be7ff;--green:#88f0b3;--red:#ff818e}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#2b2354 0,#111022 60%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{padding:22px 18px 12px;max-width:900px;margin:auto}h1{font-size:26px;margin:0 0 5px;letter-spacing:.5px}.subtitle{color:var(--muted);font-size:13px}
+main{max-width:900px;margin:auto;padding:0 14px 30px}.tabs{display:flex;gap:7px;overflow:auto;padding:10px 0 14px;position:sticky;top:0;background:#111022ed;z-index:3}.tab{border:1px solid #4b4776;border-radius:14px;padding:10px 13px;color:var(--muted);background:#1a1832;white-space:nowrap;font-weight:700}.tab.active{background:var(--gold);color:#21182e;border-color:var(--gold)}
+.panel{background:linear-gradient(145deg,#242143,#1a1933);border:1px solid #39345e;border-radius:20px;padding:16px;margin:0 0 14px;box-shadow:0 10px 30px #0002}.panel h2{font-size:18px;margin:0 0 12px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.btn{border:0;border-radius:13px;padding:12px 15px;font-weight:800;background:var(--gold);color:#251a32;cursor:pointer;font-size:14px}.btn.secondary{background:#39345f;color:var(--ink);border:1px solid #575184}.btn.pink{background:var(--pink)}.btn.green{background:var(--green)}.btn:disabled{opacity:.4}.hint{color:var(--muted);font-size:12px;line-height:1.55}.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.stat{background:#17152b;border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font-size:19px;color:var(--gold)}.stat span{font-size:11px;color:var(--muted)}
+input,select{font:inherit;color:var(--ink);background:#17152b;border:1px solid #514b7d;border-radius:10px;padding:10px;max-width:100%}input[type=file]{width:100%;font-size:12px}input[type=text]{width:100%}
+.cardgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}.gamecard{border:1px solid #575184;border-radius:16px;overflow:hidden;background:#17152b;position:relative}.gamecard img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#34304e}.cardbody{padding:10px}.cardname{font-weight:800;overflow-wrap:anywhere}.rarity{font-size:11px;font-weight:900;display:inline-block;border-radius:6px;padding:3px 6px;margin-bottom:5px;background:#555;color:white}.rarity.UR{background:linear-gradient(90deg,#ffcf56,#ff7eb6);color:#24152b}.rarity.SR{background:#a18aff}.rarity.R{background:#65c8ed;color:#1b2034}.cardstats{color:var(--muted);font-size:11px;margin:6px 0}.smallbtn{font-size:11px;padding:7px 9px;border-radius:9px}.empty{border:1px dashed #514b7d;border-radius:14px;padding:24px;text-align:center;color:var(--muted);font-size:13px}
+#pullResult{display:none;text-align:center;padding:12px 0}#pullResult img{width:min(70%,270px);aspect-ratio:4/3;object-fit:cover;border-radius:16px;border:3px solid var(--gold);box-shadow:0 0 28px #ffd16655}#pullResult h3{margin:10px 0 3px}
+.battlearena{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fighter{background:#17152b;border-radius:15px;padding:10px;text-align:center;min-width:0}.fighter img{width:100%;max-width:180px;aspect-ratio:4/3;object-fit:cover;border-radius:10px}.hpbar{height:8px;background:#413b60;border-radius:99px;overflow:hidden;margin:7px 0}.hpbar div{height:100%;background:var(--green);transition:width .2s}.log{background:#151329;border-radius:12px;padding:11px;min-height:55px;color:#ded9ff;font-size:13px;line-height:1.6;margin:10px 0}.hidden{display:none!important}.badge{background:#39345f;border-radius:99px;padding:5px 9px;font-size:12px;color:var(--muted)}
+footer{text-align:center;color:#8883a8;font-size:11px;padding:8px 20px 22px}
+@media(min-width:600px){.cardgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.gamecard img{aspect-ratio:4/3}}
+</style>
+</head>
+<body>
+<header>
+  <h1>✨ 圖片抽卡冒險</h1>
+  <div class="subtitle">把喜歡的照片變成卡牌，抽卡、收藏，再派出卡牌戰鬥。</div>
+</header>
+<main>
+  <div class="tabs">
+    <button class="tab active" data-tab="home">🏠 大廳</button>
+    <button class="tab" data-tab="custom">🖼️ 自訂卡圖</button>
+    <button class="tab" data-tab="collection">🎴 收藏冊</button>
+    <button class="tab" data-tab="battle">⚔️ 戰鬥</button>
+    <button class="tab" data-tab="backup">💾 備份</button>
+  </div>
+
+  <section id="home" class="page">
+    <div class="panel">
+      <h2>冒險者資料</h2>
+      <div class="statgrid">
+        <div class="stat"><b id="gems">0</b><span>抽卡券</span></div>
+        <div class="stat"><b id="owned">0</b><span>收藏卡牌</span></div>
+        <div class="stat"><b id="wins">0</b><span>戰鬥勝場</span></div>
+      </div>
+      <p class="hint">首次遊玩會附送 5 張抽卡券。卡圖只儲存在這台裝置的瀏覽器中，不會自動上傳。</p>
+    </div>
+    <div class="panel">
+      <h2>🎁 命運抽卡</h2>
+      <p class="hint">每抽消耗 1 張抽卡券。SSR / SR / R 的機率分別為 5% / 20% / 75%。抽到的卡會沿用你上傳的照片，並隨機生成能力值。</p>
+      <div class="row"><button class="btn" id="pullOne">抽 1 張</button><button class="btn pink" id="pullTen">十連抽（10 張券）</button><span class="badge" id="poolBadge">卡圖素材 0 張</span></div>
+      <div id="pullResult"></div>
+    </div>
+    <div class="panel">
+      <h2>🧭 快速開始</h2>
+      <p class="hint">① 到「自訂卡圖」上傳照片　② 回大廳抽卡　③ 到「戰鬥」選擇你的卡牌挑戰敵人。</p>
+      <button class="btn secondary" onclick="showTab('custom')">先新增我的卡圖 →</button>
+    </div>
+  </section>
+
+  <section id="custom" class="page hidden">
+    <div class="panel">
+      <h2>🖼️ 把自己的圖片變成卡圖素材</h2>
+      <label class="hint">可以一次選多張照片。圖片會留在這台裝置；建議使用 JPG、PNG 或 WebP。</label>
+      <p><input type="file" id="photoFiles" accept="image/*" multiple></p>
+      <div class="row"><input type="text" id="defaultName" placeholder="卡牌名稱前綴，例如：我的角色" style="flex:1;min-width:170px"><button class="btn" id="addPhotos">加入素材</button></div>
+      <p class="hint">小提醒：請只上傳你有權使用、且適合自己遊玩的照片。若照片很多，請分批加入，避免瀏覽器儲存空間不足。</p>
+    </div>
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><h2>目前卡圖素材</h2><button class="btn secondary smallbtn" id="clearPhotos">清空素材</button></div>
+      <div id="photoGrid" class="cardgrid"></div>
+    </div>
+  </section>
+
+  <section id="collection" class="page hidden">
+    <div class="panel">
+      <div class="row" style="justify-content:space-between"><h2>🎴 我的收藏冊</h2><span class="badge" id="collectionCount">0 張</span></div>
+      <p class="hint">卡牌能力由稀有度決定；重複抽到同一素材也可能得到不同能力值。</p>
+      <div id="collectionGrid" class="cardgrid"></div>
+    </div>
+  </section>
+
+  <section id="battle" class="page hidden">
+    <div class="panel">
+      <h2>⚔️ 回合制卡牌戰鬥</h2>
+      <p class="hint">選一張收藏卡出戰。每回合可選普通攻擊、技能或防禦回復。擊敗敵人可獲得 1 張抽卡券。</p>
+      <div class="row"><select id="battleCard" style="flex:1;min-width:150px"><option value="">選擇出戰卡牌</option></select><button class="btn" id="startBattle">開始戰鬥</button></div>
+      <div id="battleArea" class="hidden">
+        <div class="battlearena" style="margin-top:14px">
+          <div class="fighter"><div class="hint">你的卡牌</div><img id="heroImg" alt="出戰卡牌"><h3 id="heroName"></h3><div class="hpbar"><div id="heroHpBar"></div></div><div id="heroHpText" class="hint"></div></div>
+          <div class="fighter"><div class="hint">遭遇敵人</div><img id="enemyImg" alt="敵人"><h3 id="enemyName"></h3><div class="hpbar"><div id="enemyHpBar"></div></div><div id="enemyHpText" class="hint"></div></div>
+        </div>
+        <div id="battleLog" class="log">戰鬥開始！</div>
+        <div class="row"><button class="btn" id="attackBtn">⚔️ 普通攻擊</button><button class="btn pink" id="skillBtn">✨ 強力技能</button><button class="btn green" id="guardBtn">🛡️ 防禦＋回血</button></div>
+      </div>
+      <div id="battleEmpty" class="empty">先抽到至少一張卡牌，才能開始戰鬥。</div>
+    </div>
+  </section>
+
+  <section id="backup" class="page hidden">
+    <div class="panel">
+      <h2>💾 本機存檔備份</h2>
+      <p class="hint">所有內容都存在這個瀏覽器。清除網站資料、換手機或更換瀏覽器前，請先匯出備份。匯出的檔案包含你上傳的圖片，請自行保管。</p>
+      <div class="row"><button class="btn" id="exportBtn">匯出存檔</button><label class="btn secondary" for="importFile">匯入存檔</label><input type="file" id="importFile" accept="application/json" class="hidden"></div>
+      <p id="backupMessage" class="hint"></p>
+      <hr style="border-color:#39345e;margin:18px 0">
+      <button class="btn secondary" id="resetGame">重設遊戲（無法復原）</button>
+    </div>
+  </section>
+</main>
+<footer>圖片抽卡冒險 · 本機存檔版 · 建議定期匯出備份</footer>
+<script>
+const DB_KEY='photoGachaAdventure_v1';
+const starter={gems:5,wins:0,photos:[],cards:[],nextId:1};
+let state=loadState(), battle=null;
+function loadState(){try{const x=JSON.parse(localStorage.getItem(DB_KEY));return x?{...structuredClone(starter),...x}:structuredClone(starter)}catch(e){return structuredClone(starter)}}
+function save(){try{localStorage.setItem(DB_KEY,JSON.stringify(state));render()}catch(e){alert('儲存空間不足。請先匯出存檔，並刪除部分大型圖片後再試。')}}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function showTab(id){document.querySelectorAll('.page').forEach(p=>p.classList.toggle('hidden',p.id!==id));document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===id));if(id==='battle')updateBattleSelect();window.scrollTo({top:0,behavior:'smooth'})}
+document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+function rarity(){let n=Math.random();return n<.05?'SSR':n<.25?'SR':'R'}
+function createCard(photo){let r=rarity(),mult=r==='SSR'?1.7:r==='SR'?1.3:1;return{id:state.nextId++,photoId:photo.id,name:photo.name,src:photo.src,rarity:r,hp:Math.round((70+Math.random()*30)*mult),atk:Math.round((12+Math.random()*12)*mult),skill:Math.round((22+Math.random()*18)*mult),level:1}}
+function pull(n){if(state.gems<n){alert(`抽卡券不足！目前有 ${state.gems} 張。`);return}if(!state.photos.length){alert('請先到「自訂卡圖」上傳至少一張照片。');showTab('custom');return}state.gems-=n;let got=[];for(let i=0;i<n;i++){const p=state.photos[Math.floor(Math.random()*state.photos.length)];const c=createCard(p);state.cards.unshift(c);got.push(c)}save();const box=document.getElementById('pullResult');box.style.display='block';box.innerHTML=`<h3>🎉 抽卡結果</h3><div class="cardgrid">${got.map(cardHTML).join('')}</div>`;window.scrollTo({top:0,behavior:'smooth'})}
+document.getElementById('pullOne').onclick=()=>pull(1);document.getElementById('pullTen').onclick=()=>pull(10);
+function cardHTML(c){return `<article class="gamecard"><img src="${c.src}" alt=""><div class="cardbody"><span class="rarity ${c.rarity}">${c.rarity}</span><div class="cardname">${esc(c.name)}</div><div class="cardstats">HP ${c.hp} · 攻擊 ${c.atk} · 技能 ${c.skill}</div></div></article>`}
+async function fileToDataURL(file){return new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=reject;reader.readAsDataURL(file)})}
+document.getElementById('addPhotos').onclick=async()=>{const files=[...document.getElementById('photoFiles').files];if(!files.length){alert('請先選擇照片。');return}const prefix=document.getElementById('defaultName').value.trim();let added=0;for(let i=0;i<files.length;i++){const f=files[i];if(!f.type.startsWith('image/'))continue;try{let src=await fileToDataURL(f); // Resize large photos to reduce local storage use
+const img=await new Promise((res,rej)=>{let im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src});
+const canvas=document.createElement('canvas');const scale=Math.min(1,900/Math.max(img.width,img.height));canvas.width=Math.round(img.width*scale);canvas.height=Math.round(img.height*scale);canvas.getContext('2d').drawImage(img,0,0,canvas.width,canvas.height);src=canvas.toDataURL('image/jpeg',.82);
+state.photos.push({id:'p'+Date.now()+'_'+Math.random().toString(36).slice(2,7),name:(prefix?prefix+' ':'')+f.name.replace(/\.[^.]+$/,''),src});added++;
+}catch(e){console.warn(e)}}document.getElementById('photoFiles').value='';save();alert(`已加入 ${added} 張卡圖素材！`)};
+document.getElementById('clearPhotos').onclick=()=>{if(!confirm('確定清空所有卡圖素材？已抽出的卡牌仍會保留其圖片。'))return;state.photos=[];save()};
+function render(){document.getElementById('gems').textContent=state.gems;document.getElementById('owned').textContent=state.cards.length;document.getElementById('wins').textContent=state.wins;document.getElementById('poolBadge').textContent=`卡圖素材 ${state.photos.length} 張`;document.getElementById('collectionCount').textContent=`${state.cards.length} 張`;
+document.getElementById('photoGrid').innerHTML=state.photos.length?state.photos.map(p=>`<article class="gamecard"><img src="${p.src}" alt=""><div class="cardbody"><div class="cardname">${esc(p.name)}</div><button class="btn secondary smallbtn" onclick="removePhoto('${p.id}')">移除素材</button></div></article>`).join(''):'<div class="empty" style="grid-column:1/-1">還沒有照片。選幾張喜歡的圖片，做成自己的卡池吧！</div>';
+document.getElementById('collectionGrid').innerHTML=state.cards.length?state.cards.map(cardHTML).join(''):'<div class="empty" style="grid-column:1/-1">收藏冊還是空的，去抽第一張卡吧！</div>';updateBattleSelect()}
+function removePhoto(id){if(!confirm('移除這張素材？已抽到的卡牌不受影響。'))return;state.photos=state.photos.filter(p=>p.id!==id);save()}
+function updateBattleSelect(){const s=document.getElementById('battleCard'),old=s.value;s.innerHTML='<option value="">選擇出戰卡牌</option>'+state.cards.map(c=>`<option value="${c.id}">${esc(c.name)}（${c.rarity}｜HP ${c.hp}｜攻擊 ${c.atk}）</option>`).join('');if(state.cards.some(c=>String(c.id)===old))s.value=old;document.getElementById('battleEmpty').classList.toggle('hidden',state.cards.length>0)}
+function makeEnemy(){const names=['迷霧史萊姆','古代守衛','影子獵犬','深淵魔像','星塵巨龍'];const i=Math.floor(Math.random()*names.length);return{name:names[i],hp:90+i*22,maxHp:90+i*22,atk:9+i*3,src:enemySVG(names[i],i)}}
+function enemySVG(name,i){const colors=['#73d8c0','#d5b2ff','#ff9b9b','#b2b6c9','#ffcf56'];let svg=`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="#302c5a"/><stop offset="1" stop-color="#17152b"/></linearGradient></defs><rect width="400" height="300" fill="url(#g)"/><circle cx="200" cy="140" r="${72+i*3}" fill="${colors[i]}" opacity=".88"/><circle cx="174" cy="125" r="10" fill="#17152b"/><circle cx="226" cy="125" r="10" fill="#17152b"/><path d="M170 165 Q200 195 230 165" fill="none" stroke="#17152b" stroke-width="9" stroke-linecap="round"/><text x="200" y="260" text-anchor="middle" font-size="25" font-family="sans-serif" fill="#fff">${name}</text></svg>`;return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
+function startBattle(){const c=state.cards.find(x=>x.id==document.getElementById('battleCard').value);if(!c){alert('請先選一張卡牌。');return}battle={hero:{...c,hpNow:c.hp,maxHp:c.hp},enemy:makeEnemy(),guard:false};document.getElementById('battleArea').classList.remove('hidden');document.getElementById('battleLog').textContent=`${c.name} 遇上了 ${battle.enemy.name}！`;['attackBtn','skillBtn','guardBtn'].forEach(id=>document.getElementById(id).disabled=false);renderBattle()}
+document.getElementById('startBattle').onclick=startBattle;
+function renderBattle(){if(!battle)return;let h=battle.hero,e=battle.enemy;document.getElementById('heroImg').src=h.src;document.getElementById('heroName').textContent=h.name;document.getElementById('heroHpBar').style.width=Math.max(0,h.hpNow/h.maxHp*100)+'%';document.getElementById('heroHpText').textContent=`HP ${Math.max(0,h.hpNow)} / ${h.maxHp}`;document.getElementById('enemyImg').src=e.src;document.getElementById('enemyName').textContent=e.name;document.getElementById('enemyHpBar').style.width=Math.max(0,e.hp/e.maxHp*100)+'%';document.getElementById('enemyHpText').textContent=`HP ${Math.max(0,e.hp)} / ${e.maxHp}`}
+function turn(action){if(!battle||battle.hero.hpNow<=0||battle.enemy.hp<=0)return;let h=battle.hero,e=battle.enemy,msg='';if(action==='attack'){e.hp-=h.atk;msg=`${h.name} 普通攻擊，造成 ${h.atk} 點傷害。`}else if(action==='skill'){e.hp-=h.skill;msg=`${h.name} 施放強力技能，造成 ${h.skill} 點傷害！`}else{h.hpNow=Math.min(h.maxHp,h.hpNow+Math.round(h.maxHp*.22));battle.guard=true;msg=`${h.name} 防禦姿態，回復生命並減少下一次傷害。`}
+if(e.hp<=0){e.hp=0;state.wins++;state.gems++;msg+=`\n🎉 勝利！獲得 1 張抽卡券。`;endBattle(msg);return}
+let damage=e.atk;if(battle.guard){damage=Math.ceil(damage*.45);battle.guard=false}h.hpNow-=damage;msg+=`\n${e.name} 反擊，造成 ${damage} 點傷害。`;if(h.hpNow<=0){h.hpNow=0;msg+='\n💫 你的卡牌倒下了，再挑戰一次吧！';endBattle(msg);return}document.getElementById('battleLog').textContent=msg;renderBattle();save()}
+function endBattle(msg){document.getElementById('battleLog').textContent=msg;['attackBtn','skillBtn','guardBtn'].forEach(id=>document.getElementById(id).disabled=true);renderBattle();save()}
+document.getElementById('attackBtn').onclick=()=>turn('attack');document.getElementById('skillBtn').onclick=()=>turn('skill');document.getElementById('guardBtn').onclick=()=>turn('guard');
+document.getElementById('exportBtn').onclick=()=>{const blob=new Blob([JSON.stringify(state)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='圖片抽卡冒險存檔.json';a.click();URL.revokeObjectURL(url);document.getElementById('backupMessage').textContent='已匯出存檔。請把檔案存到「檔案」App 或其他安全位置。'};
+document.getElementById('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const obj=JSON.parse(await f.text());if(!Array.isArray(obj.photos)||!Array.isArray(obj.cards))throw Error('格式錯誤');if(!confirm('匯入會覆蓋目前的遊戲存檔，確定嗎？'))return;state={...structuredClone(starter),...obj};save();document.getElementById('backupMessage').textContent='匯入完成！'}catch(err){alert('無法匯入：檔案格式不正確。')}e.target.value=''};
+document.getElementById('resetGame').onclick=()=>{if(confirm('真的要重設嗎？卡牌、照片素材和進度都會刪除。')){state=structuredClone(starter);battle=null;save();document.getElementById('pullResult').style.display='none';document.getElementById('battleArea').classList.add('hidden');document.getElementById('backupMessage').textContent='遊戲已重設。'}}; 
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+</script>
+</body>
+</html>

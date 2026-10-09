@@ -1,0 +1,19 @@
+{
+  "name": "圖片抽卡冒險",
+  "short_name": "抽卡冒險",
+  "description": "使用自己的照片抽卡、收藏並進行回合制戰鬥。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111022",
+  "theme_color": "#17152b",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
